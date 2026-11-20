@@ -61,6 +61,23 @@ def test_no_missing_values(feats):
     assert feats[feature_columns(feats)].isna().sum().sum() == 0
 
 
+def test_temperature_humidity_feature_exists(feats):
+    """This test is expected to fail until the feature is implemented."""
+    from src.features import feature_columns
+
+    cols = set(feature_columns(feats))
+    assert "test_temp_hum_interaction" in cols, f"temperature-humidity interaction not in features: {cols}"
+
+
+def test_temperature_humidity_is_not_forbidden(feats):
+    """This test is expected to fail until the feature is implemented."""
+    from src.config import FORBIDDEN
+    from src.features import feature_columns
+
+    cols = set(feature_columns(feats))
+    assert "test_temp_hum_interaction" not in FORBIDDEN, "interaction column should not be forbidden"
+
+
 def test_dates_are_sorted_and_unique(feats):
     assert feats.dteday.is_monotonic_increasing
     assert feats.dteday.is_unique
