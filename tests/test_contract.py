@@ -3,10 +3,27 @@ import pandas as pd
 import pytest
 from sklearn.metrics import r2_score
 
-from src.config import LAG_WARMUP, TARGET
+from src.config import FORBIDDEN, ALLOWED_RAW_COLS, LAG_WARMUP, TARGET
 from src.features import build_features, feature_columns, reindex_to_calendar
 from src.ingest import load_raw
 from src.train import MODELS, temporal_split
+
+
+def test_raw_columns_are_explicitly_classified(raw):
+    """Every column in the raw CSV must be classified as FORBIDDEN or ALLOWED.
+
+    The raw data may contain columns that become features (temp, hum, windspeed)
+    and columns that are forbidden (casual, registered, cnt). It may also
+    contain columns that should be excluded entirely (instant, yr).
+
+    This test ensures no "mystery_feature" slips through: every column must
+    appear in either ALLOWED_RAW_COLS or FORBIDDEN. If a new column appears
+    without being classified here, this test fails.
+    """
+    raw_columns = set(raw.columns)
+    all_classified = (FORBIDDEN | ALLOWED_RAW_COLS)
+    missing = raw_columns - all_classified
+    assert not missing, f"unclassified raw columns: {sorted(missing)}"
 
 
 @pytest.fixture(scope="module")

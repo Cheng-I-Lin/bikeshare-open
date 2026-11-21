@@ -42,6 +42,12 @@ TIME_INDEX_COLS = {"instant", "yr", "days_since_2011"}
 #    build our own lags from the target and test those instead.
 UNVERIFIED_COLS = {"cnt_2d_bfr"}
 
+# Raw columns that are verified and safe to use in features (after exclusion of
+# FORBIDDEN). These are explicitly allowed because they appear in the raw data
+# and are not classified as forbidden.
+ALLOWED_RAW_COLS = {"dteday", "season", "mnth", "holiday", "weekday", "temp",
+                    "atemp", "hum", "windspeed", "workday", "weather"}
+
 # What feature_columns() and the tests actually enforce.
 FORBIDDEN = LEAKAGE_COLS | TIME_INDEX_COLS | UNVERIFIED_COLS
 
