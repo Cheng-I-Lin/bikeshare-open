@@ -90,3 +90,12 @@ def test_temp_hum_numerical_correctness(feats):
 def test_dates_are_sorted_and_unique(feats):
     assert feats.dteday.is_monotonic_increasing
     assert feats.dteday.is_unique
+
+
+def test_weather_encoder_raises_on_unknown_category():
+    """Regression test for Fault #3: weather encoder must raise on unknown categories."""
+    from src.features import encode_weather
+
+    series = pd.Series(["GOOD", "MISTY", "UNKNOWN_WEATHER"])
+    with pytest.raises(ValueError, match="unmapped weather labels"):
+        encode_weather(series)

@@ -95,3 +95,37 @@ Independent verification:
 git diff -- src/features.py produced no output, confirming that the temporary fault was completely removed.
 
 Conclusion: The PostToolUse hook successfully detected target leakage caused by including the current day's target in a rolling-mean feature. The hook reported the failing test after the edit, allowing the coding agent to identify and repair the problem.
+
+================================================================================
+
+Fault 3: Weather Encoder Silently Accepts Unknown Categories
+
+Exact change: In src/features.py, replaced the weather encoder's exception:
+
+raise ValueError(f"unmapped weather labels: {sorted(unknown)}")
+
+with:
+
+return series.map(WEATHER_ORDER).astype(float)
+
+This caused unknown weather categories to be mapped to NaN rather than rejected.
+
+Original PostToolUse hook result: No stderr was produced. The existing leakage tests did not detect the fault.
+
+Original test results: Claude Code reported that all 10 leakage tests and all 18 tests in the full suite passed while the fault was active.
+
+New regression test: Added test_weather_encoder_raises_on_unknown_category() to tests/test_leakage.py, which supplies an unknown weather label and expects a ValueError.
+
+Observed failing test: Claude Code reported the following pytest failure after adding the regression test:
+
+Failed: DID NOT RAISE ValueError
+
+The complete original pytest traceback was not captured in the conversation.
+
+Repair: Restored the original raise ValueError(...) statement inside encode_weather().
+
+Agent turns: 1 turn to introduce the fault, 1 turn to add the regression test (with two internal edit attempts), and 1 turn to repair the fault.
+
+Final verification: All 19 tests passed. Inspection of src/features.py confirmed that the exception was restored, and git diff -- src/features.py produced no output.
+
+Conclusion: The original PostToolUse hook failed to detect this seeded fault because the existing tests did not cover unknown weather categories. Adding a regression test exposed the bug and ensured that future removals of the exception would be detected.
