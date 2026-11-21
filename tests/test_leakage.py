@@ -78,6 +78,15 @@ def test_temperature_humidity_is_not_forbidden(feats):
     assert "test_temp_hum_interaction" not in FORBIDDEN, "interaction column should not be forbidden"
 
 
+def test_temp_hum_numerical_correctness(feats):
+    """Verify that test_temp_hum_interaction equals temp * hum exactly."""
+    import numpy as np
+    expected = feats.temp * feats.hum
+    actual = feats.test_temp_hum_interaction
+    # Use allclose which handles floating point comparisons properly
+    np.testing.assert_allclose(actual.to_numpy(), expected.to_numpy(), rtol=1e-10, atol=1e-12)
+
+
 def test_dates_are_sorted_and_unique(feats):
     assert feats.dteday.is_monotonic_increasing
     assert feats.dteday.is_unique
