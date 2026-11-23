@@ -129,3 +129,32 @@ Agent turns: 1 turn to introduce the fault, 1 turn to add the regression test (w
 Final verification: All 19 tests passed. Inspection of src/features.py confirmed that the exception was restored, and git diff -- src/features.py produced no output.
 
 Conclusion: The original PostToolUse hook failed to detect this seeded fault because the existing tests did not cover unknown weather categories. Adding a regression test exposed the bug and ensured that future removals of the exception would be detected.
+
+================================================================================
+
+Fault 4: Edit|Write Hook Misses Python Data Mutation via Bash
+
+Exact change: Used Python's csv module through Claude Code's Bash tool to create a modified copy of data/raw/bike_daily.csv. The first data row's cnt value was increased by 1, and the result was saved as data/raw/fault4_probe.csv, leaving the original dataset unchanged.
+
+python3 -I -c 'import csv; rows=list(csv.reader(open("data/raw/bike_daily.csv"))); rows[1][12]=str(int(rows[1][12])+1); out=open("data/raw/fault4_probe.csv","w",newline=""); w=csv.writer(out); w.writerows(rows); out.close()' && echo "Script completed successfully"
+
+Bash tool output:
+
+Script completed successfully
+
+PostToolUse hook stderr: None. The hook did not execute because its matcher, "Edit|Write", does not include Bash tool calls. Therefore, the modified CSV was created without automatically triggering the leakage checker.
+
+Modification observed: The file data/raw/fault4_probe.csv was successfully created, with the first data row's cnt value changed from 1229 to 1230. The original bike_daily.csv remained unchanged.
+
+Original cp attempt: Initially, we attempted to demonstrate Fault #4 using Bash cp, but Claude Code denied the command before execution:
+
+Permission to use Bash with command cp /tmp/bikeshare_fault4_backup.csv data/raw/fault4_probe.csv has been denied.
+
+The command was denied despite having an exact matching entry in the Bash Allow list. Following the professor's suggestion, we used Python through Bash as an alternative to demonstrate the same hook coverage limitation.
+
+What would have caught it: A PostToolUse hook that also matches Bash, combined with a raw-data integrity check, could detect unauthorized changes in data/raw/. A PreToolUse hook could also prevent certain unauthorized Bash operations before execution. The existing Edit|Write hook cannot detect these changes because it does not run after Bash commands.
+
+Agent turns: 1 turn to execute the successful Python-based fault demonstration, excluding the earlier unsuccessful cp attempts.
+
+Conclusion: Fault #4 successfully demonstrated that the PostToolUse hook does not cover file modifications performed through the Bash tool. Although the original cp command was blocked by Claude Code's permission system, the Python alternative successfully created a modified CSV without triggering the hook. This reveals a coverage gap in the hook configuration rather than a failure of the leakage tests themselves.
+```
