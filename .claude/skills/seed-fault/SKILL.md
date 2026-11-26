@@ -10,7 +10,7 @@ tests and hooks detect a methodological error.
 
 ## Workflow
 
-1. Ask the user which fault to introduce.
+1. Use $ARGUMENTS as the requested fault. If empty or unclear, ask the user which fault to introduce.
 2. Check git status and identify the affected files.
    Preserve all unrelated user changes.
 3. Run make test to establish a clean baseline.
