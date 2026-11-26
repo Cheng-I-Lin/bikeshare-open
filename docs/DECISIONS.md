@@ -14,4 +14,4 @@ Agents append here via the `/new-feature` skill; you append here by hand.
 - Use first-differencing experimentally: predicting daily changes mitigates the need for HGB to extrapolate absolute demand. Validation R^2 0.2399 -> 0.6194, MAE 1276.7 -> 814.0.
 - Verify first-differencing against raw calendar dates: all 530 training and validation lag values matched the previous day's actual count, supporting leakage-free one-day-ahead target reconstruction.
 - Retain the untransformed production pipeline and saved metrics: first-differencing is competitive with ridge (R^2 0.6194 vs. 0.6493, MAE 814.0 vs. 829.9), but remains a validation-only experiment.
-EOF
+- Favor persistence for deployment: despite lower test R^2 than ridge (0.5099 vs. 0.5835), persistence achieves lower MAE (840.1 vs. 946.6) without model training or additional features.
