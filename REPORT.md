@@ -35,12 +35,14 @@ feature experiment.
 MAE is measured in daily rental counts. The before configuration
 contains 14 features, while the after configuration contains 15.
 
-The currently committed untransformed metrics reproduce the
-baseline and Ridge results in the after configuration but report
-HGB validation R² of 0.2399, validation MAE of 1276.7, test R²
-of -0.4588, and test MAE of 1955.3. The cause of this discrepancy
-has not been independently established. Differences in
-scikit-learn versions are one possible explanation.
+The committed metrics were regenerated using the exact
+dependency versions pinned in requirements.txt. All reported
+scores match the original after-feature experiment. An earlier
+run in the Conda base environment produced different HGB scores,
+while the baseline and Ridge results remained unchanged.
+The discrepancy disappeared when the pipeline was executed
+in the correctly configured virtual environment.
+
 
 ## 2. Headline finding
 
@@ -88,6 +90,13 @@ successfully implements them.
 To investigate whether alternative target representations could
 improve HGB performance, I evaluated four transformations against
 an untransformed HGB reference model using the validation set.
+
+This separate experiment was conducted in the Conda base
+environment using scikit-learn 1.7.2, rather than the pinned
+version 1.9.1. All transformation comparisons used the same
+environment, so the results are internally comparable.
+The untransformed HGB reference therefore differs from the
+production metrics in Section 1.
 
 All transformations were fitted using training information only,
 and predictions were evaluated on the original rental-count scale.
