@@ -39,3 +39,9 @@ rides) from calendar, weather, and lagged-demand features.
   cannot extrapolate to 2012. That is the headline result, not an error.
 - 2012-10-29 (Hurricane Sandy, 22 rides) is in the test set. Expect it in
   any residual plot.
+
+## Skills
+
+- `/new-feature`: add and evaluate features using TDD.
+- `/seed-fault`: temporarily introduce a controlled fault,
+  inspect test coverage, document findings, and verify repair.
